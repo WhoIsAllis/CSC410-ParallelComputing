@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <time.h>
 
-#define N 100000 // intervals
+#define N 1000000000 // intervals
 
 double f(double x) {
     return 4.0 / (1.0 + x * x); // Function to integrate
@@ -24,7 +25,11 @@ double trapezoidalRule()
 }
 
 int main() {
+    clock_t start = clock();
     double pi = trapezoidalRule();
+    clock_t end = clock();
+    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Elapsed Time: %.6f seconds\n", elapsed);
     printf("Estimated value of π: %f\n", pi);
     return 0;
 }

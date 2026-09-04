@@ -18,13 +18,13 @@ void solveNQueensUtil(int board[], int col, int n)
     // Base case
     if(col == n)
     {
-        printf("Soultion: ");
+        //printf("Soultion: ");
         for (int i = 0; i < n; i++)
         {
-            printf("%d ", board[i]);
+            //printf("%d ", board[i]);
         }
 
-        printf("\n");
+        //printf("\n");
         return;
     }
 
