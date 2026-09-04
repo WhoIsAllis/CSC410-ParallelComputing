@@ -16,8 +16,26 @@ bool isSafe(int board[], int row, int col, int n)
 void solveNQueensUtil(int board[], int col, int n) 
 {
     // Base case
-        // write your code here
+    if(col == n)
+    {
+        printf("Soultion: ");
+        for (int i = 0; i < n; i++)
+        {
+            printf("%d ", board[i]);
+        }
+
+        printf("\n");
+        return;
+    }
 
     // Recursive case
-        // write your code here
+    for (int row = 0; row < n; row++)
+    {
+        if (isSafe(board, row, col, n))
+        {
+            board[col] = row;
+            solveNQueensUtil(board, col + 1, n);
+            board[col] = -1; 
+        }
+    }
 }
