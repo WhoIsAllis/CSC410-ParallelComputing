@@ -1,4 +1,5 @@
 #include "matrixMul.h"
+#include <time.h>
 
 int main() 
 {
@@ -31,9 +32,13 @@ int main()
 
     printf("Matrices initialized successfully.\n");
 
+    clock_t start = clock();
     matrixMultiply(A, B, C, N);
+    clock_t end = clock();
+    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
 
     printf("Matrix multiplication complete!\n");
+    printf("Elapsed Time: %.6f seconds\n", elapsed);
 
     // Optionally display the resulting matrix C
     printf("Resulting Matrix C:\n");

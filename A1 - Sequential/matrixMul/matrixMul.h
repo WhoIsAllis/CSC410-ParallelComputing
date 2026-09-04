@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> // For malloc() and free()
 
-#define N 10 // Adjust this to test larger matrix sizes
+#define N 1000 // Adjust this to test larger matrix sizes
 
 void displayMatrix(int** matrix, int n) 
 {

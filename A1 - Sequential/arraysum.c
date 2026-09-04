@@ -1,6 +1,7 @@
 #include <stdio.h>
+#include <time.h>
 
-#define SIZE 10000
+#define SIZE 500000
 
 int sumArray(int arr[], int size) 
 {
@@ -19,8 +20,13 @@ int main()
         arr[i] = i + 1; 
     }
 
+    clock_t start = clock();
     int totalSum = sumArray(arr, SIZE);
+    clock_t end = clock();
+    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+
     printf("Total Sum: %d\n", totalSum);
+    printf("Elapsed Time: %.6f seconds\n", elapsed);
 
     return 0;
 }
