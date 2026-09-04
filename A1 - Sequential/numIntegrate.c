@@ -8,7 +8,19 @@ double f(double x) {
 
 double trapezoidalRule() 
 {
-    // complete this
+    double lowBound = 0.0;
+    double highBound = 1.0;
+    double width = (highBound - lowBound) / N;
+    double sum = 0.5 * (f(lowBound) + f(highBound));
+    double answer = 0.0;
+
+    for (int i = 1; i < N; i++) {
+        double x = lowBound + i * width;
+        sum += f(x);
+    }
+
+    answer = sum * width;
+    return answer;
 }
 
 int main() {
