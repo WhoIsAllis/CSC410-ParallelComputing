@@ -3,7 +3,7 @@
 
 int main() 
 {
-    int n = 13;
+    int n = 5;
     int* board = (int*)malloc(n * sizeof(int));
     if (board == NULL) {
         fprintf(stderr, "Memory allocation failed\n");

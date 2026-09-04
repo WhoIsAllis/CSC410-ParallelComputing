@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define SIZE 500000
+#define SIZE 60
 
 int sumArray(int arr[], int size) 
 {
