@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> // For malloc() and free()
 
-#define N 1000 // Adjust this to test larger matrix sizes
+#define N 10 // Adjust this to test larger matrix sizes
 
 void displayMatrix(int** matrix, int n) 
 {
@@ -15,5 +15,16 @@ void displayMatrix(int** matrix, int n)
 
 void matrixMultiply(int** A, int** B, int** C, int n) 
 {
-    // complete this
+    for (int i = 0; i < n; i++) 
+    {
+        for (int j = 0; j < n; j++)
+        {
+            int sum = 0;
+            for (int k = 0; k < n; k++)
+            {
+                sum += A[i][k] * B[k][j];
+            }
+            C[i][j] = sum;
+        }
+    }
 }
