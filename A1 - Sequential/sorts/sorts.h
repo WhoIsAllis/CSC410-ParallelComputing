@@ -1,7 +1,7 @@
 #ifndef SORT_H
 #define SORT_H
 
-#define SIZE 100000
+#define SIZE 10
 #define MAX_VAL 100  // max random number
 
 #include <stdio.h>

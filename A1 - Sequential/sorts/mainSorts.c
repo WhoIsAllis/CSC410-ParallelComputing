@@ -21,24 +21,24 @@ int main()
         arr2[i] = val;
     }
 
-    //printf("Original array:\n");
-    //printArray(arr1, SIZE);
+    printf("Original array:\n");
+    printArray(arr1, SIZE);
 
     clock_t mergeStart = clock();
     mergeSort(arr1, 0, SIZE - 1);
     clock_t mergeEnd = clock();
     double mergeElapsed = (double)(mergeEnd - mergeStart) / CLOCKS_PER_SEC;
     printf("Merge Sort Elapsed Time: %.6f seconds\n", mergeElapsed);
-    //printf("Sorted with Merge Sort:\n");
-    //printArray(arr1, SIZE);
+    printf("Sorted with Merge Sort:\n");
+    printArray(arr1, SIZE);
 
     clock_t bubbleStart = clock();
     bubbleSort(arr2, SIZE);
     clock_t bubbleEnd = clock();
     double bubbleElapsed = (double)(bubbleEnd - bubbleStart) / CLOCKS_PER_SEC;
     printf("Bubble Sort Elapsed Time: %.6f seconds\n", bubbleElapsed);
-    //printf("Sorted with Bubble Sort:\n");
-    //printArray(arr2, SIZE);
+    printf("Sorted with Bubble Sort:\n");
+    printArray(arr2, SIZE);
 
     free(arr1);
     free(arr2);
