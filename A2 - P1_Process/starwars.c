@@ -35,8 +35,7 @@ int main(void)
         {
             printf("%s: Adjusting shield power.\n", characters[i]);
             shield_power += adjustments[i];
-            printf("%s: Shield power level now at %d%%\n.",
-                   characters[i], shield_power);
+            printf("%s: Shield power level now at %d%%\n.", characters[i], shield_power);
             return 0;
         }
 
