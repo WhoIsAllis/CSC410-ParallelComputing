@@ -1,32 +1,47 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
-#define SIZE 60
+#define SIZE 100000000
 
-int sumArray(int arr[], int size) 
+long long sumArray(int arr[], int size)
 {
-    int sum = 0;
+    long long sum = 0;
+
     for (int i = 0; i < size; i++) 
     {
         sum += arr[i];
     }
+
     return sum;
 }
 
-int main() 
+int main()
 {
-    int arr[SIZE];
-    for (int i = 0; i < SIZE; i++) {
-        arr[i] = i + 1; 
+    int *arr = malloc(SIZE * sizeof(int));
+    if (arr == NULL) 
+    {
+        printf("Memory allocation failed.\n");
+        return 1;
     }
 
-    clock_t start = clock();
-    int totalSum = sumArray(arr, SIZE);
-    clock_t end = clock();
-    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+    for (int i = 0; i < SIZE; i++) 
+    {
+        arr[i] = i + 1;
+    }
 
-    printf("Total Sum: %d\n", totalSum);
-    printf("Elapsed Time: %.6f seconds\n", elapsed);
+    struct timespec startTime, endTime;
+    clock_gettime(CLOCK_MONOTONIC, &startTime);
 
+    long long totalSum = sumArray(arr, SIZE);
+
+    clock_gettime(CLOCK_MONOTONIC, &endTime);
+
+    double elapsed = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_nsec - startTime.tv_nsec) / 1000000000.0;
+
+    printf("Total Sum: %lld\n", totalSum);
+    printf("Elapsed Time: %.4f seconds\n", elapsed);
+
+    free(arr);
     return 0;
 }
