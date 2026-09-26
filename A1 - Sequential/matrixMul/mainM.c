@@ -32,20 +32,22 @@ int main()
 
     printf("Matrices initialized successfully.\n");
 
-    clock_t start = clock();
+    struct timespec startTime, endTime;
+    clock_gettime(CLOCK_MONOTONIC, &startTime);
+
     matrixMultiply(A, B, C, N);
-    clock_t end = clock();
-    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+
+    clock_gettime(CLOCK_MONOTONIC, &endTime);
+
+    double elapsed = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_nsec - startTime.tv_nsec) / 1000000000.0;
 
     printf("Matrix multiplication complete!\n");
-    printf("Elapsed Time: %.6f seconds\n", elapsed);
-
-    // Optionally display the resulting matrix C
-    printf("Resulting Matrix C:\n");
-    displayMatrix(C, N);
+    printf("Result check: C[0][0] = %d\n", C[0][0]);
+    printf("Elapsed Time: %.4f seconds\n", elapsed);
 
     // Free dynamically allocated memory
-    for (int i = 0; i < N; ++i) {
+    for (int i = 0; i < N; ++i) 
+    {
         free(A[i]);
         free(B[i]);
         free(C[i]);

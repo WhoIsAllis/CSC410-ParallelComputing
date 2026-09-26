@@ -1,58 +1,144 @@
-#include "matrixMul.h"
+#include "matrixT.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
-int main() 
+int **A;
+int **B;
+int **C;
+int threadCount = NUM_THREADS;
+
+int **allocateMatrix(void)
 {
-    // Dynamically allocate memory for the matrices
-    int** A = (int**)malloc(N * sizeof(int*));
-    int** B = (int**)malloc(N * sizeof(int*));
-    int** C = (int**)malloc(N * sizeof(int*));
-    
-    for (int i = 0; i < N; ++i) {
-        A[i] = (int*)malloc(N * sizeof(int));
-        B[i] = (int*)malloc(N * sizeof(int));
-        C[i] = (int*)malloc(N * sizeof(int));
+    int **matrix = malloc(N * sizeof(int *));
+    if (matrix == NULL) 
+    {
+        return NULL;
     }
 
-    if (A == NULL || B == NULL || C == NULL) {
-        printf("Memory allocation failed!\n");
-        return -1;
+    for (int i = 0; i < N; i++) 
+    {
+        matrix[i] = malloc(N * sizeof(int));
+        if (matrix[i] == NULL) 
+        {
+            for (int j = 0; j < i; j++) 
+            {
+                free(matrix[j]);
+            }
+            free(matrix);
+            return NULL;
+        }
     }
 
-    printf("Matrices allocated successfully.\n");
+    return matrix;
+}
 
-    // Initialize matrices A and B
-    for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
+void freeMatrix(int **matrix)
+{
+    for (int i = 0; i < N; i++) 
+    {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+void *matrixMultiplyThread(void *arg)
+{
+    int threadId = *(int *)arg;
+    int rowsPerThread = N / threadCount;
+    int startRow = threadId * rowsPerThread;
+    int endRow = (threadId == threadCount - 1) ? N : startRow + rowsPerThread;
+
+    for (int i = startRow; i < endRow; i++) 
+    {
+        for (int j = 0; j < N; j++) 
+        {
+            int sum = 0;
+            for (int k = 0; k < N; k++) {
+                sum += A[i][k] * B[k][j];
+            }
+            C[i][j] = sum;
+        }
+    }
+
+    return NULL;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc > 2) 
+    {
+        printf("Usage: %s [number of threads: 1-%d]\n", argv[0], NUM_THREADS);
+        return 1;
+    }
+
+    if (argc == 2) 
+    {
+        threadCount = atoi(argv[1]);
+    }
+
+    if (threadCount < 1 || threadCount > NUM_THREADS) 
+    {
+        printf("Usage: %s [number of threads: 1-%d]\n", argv[0], NUM_THREADS);
+        return 1;
+    }
+
+    A = allocateMatrix();
+    B = allocateMatrix();
+    C = allocateMatrix();
+
+    if (A == NULL || B == NULL || C == NULL) 
+    {
+        printf("Memory allocation failed.\n");
+        if (A != NULL) freeMatrix(A);
+        if (B != NULL) freeMatrix(B);
+        if (C != NULL) freeMatrix(C);
+        return 1;
+    }
+
+    for (int i = 0; i < N; i++) 
+    {
+        for (int j = 0; j < N; j++) 
+        {
             A[i][j] = 1;
             B[i][j] = 1;
             C[i][j] = 0;
         }
     }
 
-    printf("Matrices initialized successfully.\n");
+    pthread_t threads[NUM_THREADS];
+    int threadIds[NUM_THREADS];
+    struct timespec startTime, endTime;
 
-    clock_t start = clock();
-    matrixMultiply(A, B, C, N);
-    clock_t end = clock();
-    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+    clock_gettime(CLOCK_MONOTONIC, &startTime);
 
-    printf("Matrix multiplication complete!\n");
-    printf("Elapsed Time: %.6f seconds\n", elapsed);
-
-    // Optionally display the resulting matrix C
-    printf("Resulting Matrix C:\n");
-    displayMatrix(C, N);
-
-    // Free dynamically allocated memory
-    for (int i = 0; i < N; ++i) {
-        free(A[i]);
-        free(B[i]);
-        free(C[i]);
+    for (int i = 0; i < threadCount; i++) 
+    {
+        threadIds[i] = i;
+        if (pthread_create(&threads[i], NULL, matrixMultiplyThread, &threadIds[i]) != 0) 
+        {
+            printf("Thread creation failed.\n");
+            return 1;
+        }
     }
-    free(A);
-    free(B);
-    free(C);
+
+    for (int i = 0; i < threadCount; i++) 
+    {
+        pthread_join(threads[i], NULL);
+    }
+
+    clock_gettime(CLOCK_MONOTONIC, &endTime);
+
+    double elapsed = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_nsec - startTime.tv_nsec) / 1000000000.0;
+
+    printf("Matrix multiplication complete.\n");
+    printf("Threads: %d\n", threadCount);
+    printf("Elapsed Time: %.4f seconds\n", elapsed);
+
+    freeMatrix(A);
+    freeMatrix(B);
+    freeMatrix(C);
 
     return 0;
 }
