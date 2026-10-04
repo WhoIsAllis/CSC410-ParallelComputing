@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
 
 #define NUM_PLAYERS 3
 #define GAME_DURATION 10 
@@ -14,15 +15,34 @@ int currentPlayer = 0; // Index of the current player
 int gameActive = 1;    // Game state
 int scores[NUM_PLAYERS] = {0}; // Keep track of each player's score
 
+pthread_mutex_t gameMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t playerTurn = PTHREAD_COND_INITIALIZER;
+
 
 void* hack(void* arg) {
     int id = *(int*)arg;
 
-    while (gameActive) {
+    while (1) {
+        pthread_mutex_lock(&gameMutex);
+
+        // Wait until player's turn or game ends
+        while (gameActive && currentPlayer != id) 
+        {
+            pthread_cond_wait(&playerTurn, &gameMutex);
+        }
+
+        if (!gameActive) 
+        {
+            pthread_mutex_unlock(&gameMutex);
+            break;
+        }
 
         // Simulate hacking
         printf("Player %d is attempting to hack... -------------- Current Player (%d)\n", id + 1, currentPlayer+1);
+        pthread_mutex_unlock(&gameMutex);
         sleep(1); 
+
+        pthread_mutex_lock(&gameMutex);
         
         // Randomly determine success or failure
         int hackResult = rand() % 10 + 1;
@@ -35,6 +55,8 @@ void* hack(void* arg) {
 
         // Move to the next player
         currentPlayer = (currentPlayer + 1) % NUM_PLAYERS;
+        pthread_cond_broadcast(&playerTurn);
+        pthread_mutex_unlock(&gameMutex);
 
     }
     
@@ -57,7 +79,11 @@ int main() {
 
     // Let the game run for a specified duration
     sleep(GAME_DURATION);
+
+    pthread_mutex_lock(&gameMutex);
     gameActive = 0; // End the game
+    pthread_cond_broadcast(&playerTurn);
+    pthread_mutex_unlock(&gameMutex);
 
 
     // Join player threads
@@ -75,6 +101,9 @@ int main() {
         }
     }
     printf("Player %d wins with %d points\n", winner+1, scores[winner]);
+
+    pthread_mutex_destroy(&gameMutex);
+    pthread_cond_destroy(&playerTurn);
 
     
     return 0;
