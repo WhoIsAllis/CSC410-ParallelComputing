@@ -1,5 +1,7 @@
 // Finding the average of an array - help needed with synchronization
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -10,6 +12,7 @@
 
 int numbers[ARRAY_SIZE] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}; 
 int partial_sums[NUM_THREADS] = {0}; 
+pthread_barrier_t barrier;
 
 void* func(void* arg) {
     int id = *((int*)arg);
@@ -24,6 +27,8 @@ void* func(void* arg) {
     }
     printf("Thread %d: Partial sum is %d.\n", id, partial_sums[id]);
 
+    // Wait until all threads finish calculating their partial sums
+    pthread_barrier_wait(&barrier);
 
     // Phase 2: Calculate the total sum and average
     if (id == 0) { // Only the first thread calculates the final average
@@ -42,6 +47,8 @@ int main() {
     pthread_t threads[NUM_THREADS];
     int thread_ids[NUM_THREADS] = {0, 1, 2, 3, 4};
 
+    pthread_barrier_init(&barrier, NULL, NUM_THREADS);
+
     // Create threads
     for (int i = 0; i < NUM_THREADS; i++) {
         pthread_create(&threads[i], NULL, func, &thread_ids[i]);
@@ -51,6 +58,8 @@ int main() {
     for (int i = 0; i < NUM_THREADS; i++) {
         pthread_join(threads[i], NULL);
     }
+
+    pthread_barrier_destroy(&barrier);
 
     return 0;
 }
