@@ -1,8 +1,11 @@
 #ifndef PARALLEL_SORTS_H
 #define PARALLEL_SORTS_H
 
+#define _POSIX_C_SOURCE 200809L
+
 #define SIZE 100000
 #define MAX_VAL 100000  // max random number
+#define NUM_THREADS 4
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +24,10 @@ void merge_sort_seq(int* arr, int l, int r);
 
 void merge_sort_p(int* arr, int l, int r);
 void* parallel_merge_sort(void* arg);
+
+void mergeSortSegment(int* arr, int l, int r, int threadCount);
+void mergeSortRecursive(int* arr, int l, int r, int threadCount);
+void mergeSortPool(int* arr, int l, int r, int threadCount);
 
 void printArray(int* arr, int n);
 double time_diff_ms(struct timespec start, struct timespec end);
