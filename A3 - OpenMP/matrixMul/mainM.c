@@ -1,8 +1,21 @@
 #include "matrixMul.h"
-#include <time.h>
+#include <omp.h>
 
-int main() 
+int main(int argc, char *argv[]) 
 {
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: %s <positive number of threads>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    int threadCount = atoi(argv[1]);
+    if (threadCount < 1)
+    {
+        fprintf(stderr, "Please use a positive value of threads!\n");
+        return EXIT_FAILURE;
+    }
+
     // Dynamically allocate memory for the matrices
     int** A = (int**)malloc(N * sizeof(int*));
     int** B = (int**)malloc(N * sizeof(int*));
@@ -32,18 +45,19 @@ int main()
 
     printf("Matrices initialized successfully.\n");
 
-    struct timespec startTime, endTime;
-    clock_gettime(CLOCK_MONOTONIC, &startTime);
+    omp_set_num_threads(threadCount);
 
+    double startTime = omp_get_wtime();
     matrixMultiply(A, B, C, N);
+    double endTime = omp_get_wtime();
 
-    clock_gettime(CLOCK_MONOTONIC, &endTime);
-
-    double elapsed = (endTime.tv_sec - startTime.tv_sec) + (endTime.tv_nsec - startTime.tv_nsec) / 1000000000.0;
+    int resultCorrect = C[0][0] == N;
 
     printf("Matrix multiplication complete!\n");
+    printf("Threads: %d\n", threadCount);
     printf("Result check: C[0][0] = %d\n", C[0][0]);
-    printf("Elapsed Time: %.4f seconds\n", elapsed);
+    printf("Result: %s\n", resultCorrect ? "correct" : "incorrect");
+    printf("Elapsed Time: %.6f seconds\n", endTime - startTime);
 
     // Free dynamically allocated memory
     for (int i = 0; i < N; ++i) 
@@ -52,9 +66,10 @@ int main()
         free(B[i]);
         free(C[i]);
     }
+    
     free(A);
     free(B);
     free(C);
 
-    return 0;
+    return resultCorrect ? EXIT_SUCCESS : EXIT_FAILURE;
 }
