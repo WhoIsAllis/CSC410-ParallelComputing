@@ -1,24 +1,37 @@
 #include "nqueens.h"
-#include <time.h>
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-int main() 
+#ifndef N
+#define N 15
+#endif
+
+int main(int argc, char *argv[]) 
 {
-    int n = 5;
-    int* board = (int*)malloc(n * sizeof(int));
-    if (board == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return 1;
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: %s <positive number of threads>\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
-    for (int i = 0; i < n; i++) {
-        board[i] = -1;
+    int threadCount = atoi(argv[1]);
+    if (threadCount < 1)
+    {
+        fprintf(stderr, "Please have a positive amount of threads!\n");
+        return EXIT_FAILURE;
     }
 
-    clock_t start = clock();
-    solveNQueensUtil(board, 0, n);
-    clock_t end = clock();
-    double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Elapsed Time: %.6f seconds\n", elapsed);
-    free(board);
+    omp_set_num_threads(threadCount);
+
+    double startTime = omp_get_wtime();
+    long long solutionCount = solveNQueens(N);
+    double endTime = omp_get_wtime();
+
+    printf("Board Size: %d\n", N);
+    printf("Threads: %d\n", threadCount);
+    printf("Solutions: %lld\n", solutionCount);
+    printf("Elapsed Time: %.6f seconds\n", endTime - startTime);
+
     return 0;
 }
